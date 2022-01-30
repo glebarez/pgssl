@@ -1,4 +1,4 @@
-module pgssl
+module github.com/glebarez/pgssl
 
 go 1.17
 
