@@ -16,6 +16,12 @@ var options struct {
 	clientKeyPath  string
 }
 
+func argFatal(s string) {
+	fmt.Fprintln(os.Stderr, s)
+	flag.Usage()
+	os.Exit(1)
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage:  %s [options]\n", os.Args[0])
@@ -30,13 +36,13 @@ func main() {
 	flag.Parse()
 
 	if options.pgAddress == "" {
-		log.Fatal("postgres address must be specified")
+		argFatal("postgres address must be specified")
 	}
 	if options.clientCertPath == "" {
-		log.Fatal("clientCertPath must be specified")
+		argFatal("clientCertPath must be specified")
 	}
 	if options.clientKeyPath == "" {
-		log.Fatal("clientKeyPath must be specified")
+		argFatal("clientKeyPath must be specified")
 	}
 
 	// load client certificate and key
