@@ -76,10 +76,8 @@ func (p *PgSSL) HandleConn(clientConn net.Conn) error {
 
 	// upgrade connection to TLS
 	pgTLSconn := tls.Client(pgConn, &tls.Config{
-		GetClientCertificate:     func(cri *tls.CertificateRequestInfo) (*tls.Certificate, error) { return p.clientCert, nil },
-		InsecureSkipVerify:       true,
-		PreferServerCipherSuites: true,
-		MinVersion:               tls.VersionTLS12,
+		GetClientCertificate: func(cri *tls.CertificateRequestInfo) (*tls.Certificate, error) { return p.clientCert, nil },
+		InsecureSkipVerify:   true,
 	})
 
 	// upgrade frontend
