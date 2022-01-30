@@ -14,7 +14,4 @@ pgSSL wraps connections with regard to PostgreSQL-specific SSL handshake.
 ```go get -u github.com/glebarez/pgssl```
 
 ### Usage example
-```console
-pgssl -p postgres-server:5432 -l :15432 -k client.key -c client.crt
-2022/01/31 00:25:32 Listening on [::]:15432
-```
+```pgssl -p postgres-server:5432 -l :15432 -k client.key -c client.crt```
