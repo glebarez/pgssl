@@ -10,10 +10,11 @@ import (
 )
 
 var options struct {
-	listenAddress  string
-	pgAddress      string
-	clientCertPath string
-	clientKeyPath  string
+	listenAddress    string
+	pgAddress        string
+	clientCertPath   string
+	clientKeyPath    string
+	useClientKeyPair bool
 }
 
 func argFatal(s string) {
@@ -33,6 +34,7 @@ func main() {
 	flag.StringVar(&options.pgAddress, "p", "", "Postgres address")
 	flag.StringVar(&options.clientCertPath, "c", "", "clientCertPath")
 	flag.StringVar(&options.clientKeyPath, "k", "", "clientKeyPath")
+	flag.BoolVar(&options.useClientKeyPair, "use-client-keypair", true, "Whether to use a client keypair")
 	flag.Parse()
 
 	if options.pgAddress == "" {
