@@ -10,11 +10,10 @@ import (
 )
 
 var options struct {
-	listenAddress    string
-	pgAddress        string
-	clientCertPath   string
-	clientKeyPath    string
-	useClientKeyPair bool
+	listenAddress  string
+	pgAddress      string
+	clientCertPath string
+	clientKeyPath  string
 }
 
 func argFatal(s string) {
@@ -34,39 +33,28 @@ func main() {
 	flag.StringVar(&options.pgAddress, "p", "", "Postgres address")
 	flag.StringVar(&options.clientCertPath, "c", "", "clientCertPath")
 	flag.StringVar(&options.clientKeyPath, "k", "", "clientKeyPath")
-	flag.BoolVar(&options.useClientKeyPair, "use-client-keypair", true, "Whether to use a client keypair")
 	flag.Parse()
 
 	if options.pgAddress == "" {
 		argFatal("postgres address must be specified")
 	}
+	if options.clientCertPath == "" {
+		argFatal("clientCertPath must be specified")
+	}
+	if options.clientKeyPath == "" {
+		argFatal("clientKeyPath must be specified")
+	}
+
+	// load client certificate and key
+	cert, err := tls.LoadX509KeyPair(options.clientCertPath, options.clientKeyPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// create pgSSL instance
 	pgSSL := &PgSSL{
-		pgAddr: options.pgAddress,
-	}
-
-	if options.useClientKeyPair {
-		if options.clientCertPath == "" {
-			argFatal("clientCertPath must be specified")
-		}
-		if options.clientKeyPath == "" {
-			argFatal("clientKeyPath must be specified")
-		}
-
-		// load client certificate and key
-		cert, err := tls.LoadX509KeyPair(options.clientCertPath, options.clientKeyPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// recreate pgSSL instance with client keypair
-		pgSSL = &PgSSL{
-			pgAddr:     options.pgAddress,
-			clientCert: &cert,
-		}
-	} else {
-		log.Println("Not using client keypair")
+		pgAddr:     options.pgAddress,
+		clientCert: &cert,
 	}
 
 	// bind listening socket
