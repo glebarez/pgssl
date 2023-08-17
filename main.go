@@ -38,11 +38,8 @@ func main() {
 	if options.pgAddress == "" {
 		argFatal("postgres address must be specified")
 	}
-	if options.clientCertPath == "" {
-		argFatal("clientCertPath must be specified")
-	}
-	if options.clientKeyPath == "" {
-		argFatal("clientKeyPath must be specified")
+	if (options.clientCertPath == "") != (options.clientKeyPath == "") {
+		argFatal("You must specify both clientKeyPath and clientCertPath to use a client certificate")
 	}
 
 	// load client certificate and key
