@@ -28,7 +28,7 @@ sequenceDiagram
 ```
 
 ### Installation
-```go get -u github.com/glebarez/pgssl```
+```go install github.com/glebarez/pgssl```
 
 ### Usage examples
 - ```pgssl -p postgres-server:5432 -l :15432 -k client.key -c client.crt```
