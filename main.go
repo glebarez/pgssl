@@ -42,16 +42,23 @@ func main() {
 		argFatal("You must specify both clientKeyPath and clientCertPath to use a client certificate")
 	}
 
-	// load client certificate and key
-	cert, err := tls.LoadX509KeyPair(options.clientCertPath, options.clientKeyPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// create pgSSL instance
 	pgSSL := &PgSSL{
-		pgAddr:     options.pgAddress,
-		clientCert: &cert,
+		pgAddr: options.pgAddress,
+	}
+
+	if (options.clientCertPath != "") && (options.clientKeyPath != "") {
+		// load client certificate and key
+		cert, err := tls.LoadX509KeyPair(options.clientCertPath, options.clientKeyPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// recreate pgSSL instance with our client cert
+		pgSSL = &PgSSL{
+			pgAddr:     options.pgAddress,
+			clientCert: &cert,
+		}
 	}
 
 	// bind listening socket
