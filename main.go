@@ -34,7 +34,8 @@ func main() {
 	flag.StringVar(&options.pgAddress, "p", "", "Postgres address")
 	flag.StringVar(&options.clientCertPath, "c", "", "clientCertPath")
 	flag.StringVar(&options.clientKeyPath, "k", "", "clientKeyPath")
-	flag.StringVar(&options.connectionPassword, "s", "", "Password used to authenticate to pgssl")
+	flag.StringVar(&options.connectionPassword, "s", "", "Password used to authenticate to pgssl\n" +
+		"can alternatively be specified via the PGSSL_PASSWORD environment variable")
 	flag.Parse()
 
 	if options.pgAddress == "" {
@@ -42,6 +43,15 @@ func main() {
 	}
 	if (options.clientCertPath == "") != (options.clientKeyPath == "") {
 		argFatal("You must specify both clientKeyPath and clientCertPath to use a client certificate")
+	}
+
+	var envPassword string = os.Getenv("PGSSL_PASSWORD")
+	if envPassword != "" {
+		if options.connectionPassword != "" {
+			log.Println("PGSSL_PASSWORD and -s <password> specified. Ignoring env variable.")
+		} else {
+			options.connectionPassword = envPassword
+		}
 	}
 
 	// create pgSSL instance
