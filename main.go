@@ -10,10 +10,11 @@ import (
 )
 
 var options struct {
-	listenAddress  string
-	pgAddress      string
-	clientCertPath string
-	clientKeyPath  string
+	listenAddress      string
+	pgAddress          string
+	clientCertPath     string
+	clientKeyPath      string
+	connectionPassword string
 }
 
 func argFatal(s string) {
@@ -33,6 +34,7 @@ func main() {
 	flag.StringVar(&options.pgAddress, "p", "", "Postgres address")
 	flag.StringVar(&options.clientCertPath, "c", "", "clientCertPath")
 	flag.StringVar(&options.clientKeyPath, "k", "", "clientKeyPath")
+	flag.StringVar(&options.connectionPassword, "s", "", "Password used to authenticate to pgssl")
 	flag.Parse()
 
 	if options.pgAddress == "" {
@@ -44,7 +46,8 @@ func main() {
 
 	// create pgSSL instance
 	pgSSL := &PgSSL{
-		pgAddr: options.pgAddress,
+		pgAddr:             options.pgAddress,
+		connectionPassword: options.connectionPassword,
 	}
 
 	if (options.clientCertPath != "") && (options.clientKeyPath != "") {
@@ -56,8 +59,9 @@ func main() {
 
 		// recreate pgSSL instance with our client cert
 		pgSSL = &PgSSL{
-			pgAddr:     options.pgAddress,
-			clientCert: &cert,
+			pgAddr:             options.pgAddress,
+			clientCert:         &cert,
+			connectionPassword: options.connectionPassword,
 		}
 	}
 

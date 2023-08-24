@@ -9,8 +9,9 @@ import (
 )
 
 type PgSSL struct {
-	pgAddr     string
-	clientCert *tls.Certificate
+	pgAddr             string
+	clientCert         *tls.Certificate
+	connectionPassword string
 }
 
 func (p *PgSSL) HandleConn(clientConn net.Conn) error {
@@ -37,6 +38,22 @@ func (p *PgSSL) HandleConn(clientConn net.Conn) error {
 		return fmt.Errorf("client must not use SSL")
 	default:
 		return fmt.Errorf("unknown startup message: %#v", clientStartupMessage)
+	}
+
+	if p.connectionPassword != "" {
+		backend.Send(&pgproto3.AuthenticationCleartextPassword{})
+
+		// receive password message from the client
+		clientPasswordMessage, err := backend.Receive()
+		if err != nil {
+			return fmt.Errorf("error receiving password message: %w", err)
+		}
+		clientPassword := clientPasswordMessage.(*pgproto3.PasswordMessage).Password
+		if clientPassword != p.connectionPassword {
+			backend.Send(&pgproto3.ErrorResponse{Severity: "FATAL", Message: "wrong password"})
+			return fmt.Errorf("wrong password")
+		}
+		// no need to send AuthenticationOk, it will be sent by the postgres backend
 	}
 
 	// open connection to postgres backend
